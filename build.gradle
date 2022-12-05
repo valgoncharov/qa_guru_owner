@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'io.qameta.allure' version '2.10.0'
 }
 
 group 'qa.guru'
@@ -9,8 +10,28 @@ repositories {
     mavenCentral()
 }
 
+def allureVersion = "2.20.1",
+    selenideVersion = "6.9.0",
+    junitVersion = "5.9.1"
+
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter {
+        aspectjWeaver.set(true)
+        frameworks {
+            junit5 {
+                adapterVersion.set(allureVersion)
+            }
+        }
+    }
+}
 dependencies {
-    testImplementation ('org.junit.jupiter:junit-jupiter:5.8.1',
+    testImplementation ("org.aspectj:aspectjweaver:1.9.6",
+                        "com.codeborne:selenide:$selenideVersion",
+                        "io.qameta.allure:allure-selenide:$allureVersion",
+                        "org.junit.jupiter:junit-jupiter:$junitVersion",
                         'org.seleniumhq.selenium:selenium-java:3.141.59',
                         'org.slf4j:log4j-over-slf4j:2.0.2',
                         'org.slf4j:slf4j-simple:2.0.2',
@@ -24,8 +45,14 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
-test {
+tasks.withType(Test) {
     useJUnitPlatform()
-    //-DbaseUrl=https://github.com -Dbrowser=FIREFOX
-    systemProperties(System.getProperties())//Перекладывает system prop в тесты
+    systemProperties(System.getProperties())
+
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
 }
