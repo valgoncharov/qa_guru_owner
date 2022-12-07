@@ -1,49 +1,26 @@
 package qa.guru.owner.config;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import com.codeborne.selenide.Configuration;
 import org.aeonbits.owner.ConfigFactory;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.util.function.Supplier;
+public class WebDriverProvider {
+    public static WebDriverConfig config = ConfigFactory.create(WebDriverConfig.class, System.getProperties());
 
-public class WebDriverProvider implements Supplier<WebDriver> {
-    //теперь применяем конфигурацию Браузер и ВебКонфиг
-    private final WebDriverConfig config;
-//    public WebDriverProvider(){
-//        this(new WebDriverConfig());
-//    } не стал использовать Артем в лекции
+    public static void configure() {
 
-    public WebDriverProvider(){
-//это называется прокси классы
-        this.config = ConfigFactory.create(WebDriverConfig.class, System.getProperties());
-    }
-
-
-    @Override
-    public WebDriver get() {
-        WebDriver driver = createDriver();
-        driver.get(config.getBaseUrl());
-        //driver.get("https://github.com"); после конфиг не нужен
-        return driver;
-    }
-
-    public WebDriver createDriver(){
-        //теперь пишем логику
-        switch (config.getBrowser()){
-            case CHROME:{
-                System.setProperty("webdriver.chrome.driver", "C:\\chromedriver\\chromedriver.exe");//запуск мой 403
-               //WebDriverManager.chromedriver().setup();
-                return new ChromeDriver();
-            }
-            case FIREFOX:{
-                WebDriverManager.firefoxdriver().setup();
-                return new FirefoxDriver();
-            }
-            default:{
-                throw new RuntimeException("No such driver");
-            }
+        Configuration.baseUrl = config.baseUrl();
+        Configuration.browser = config.browser();
+        Configuration.browserSize = config.browserSize();
+        Configuration.browserVersion = config.browserVersion();
+        System.setProperty("chromeoptions.prefs", "intl.accept_languages=ru");
+        String configSource = config.remoteUrl();
+        if (configSource != null) {
+            Configuration.remote = config.remoteUrl();
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            Configuration.browserCapabilities = capabilities;
+            capabilities.setCapability("enableVNC", true);
+            capabilities.setCapability("enableVideo", true);
         }
     }
 }

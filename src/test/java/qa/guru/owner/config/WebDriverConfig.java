@@ -1,20 +1,27 @@
 package qa.guru.owner.config;
 
 import org.aeonbits.owner.Config;
-
-import java.net.URL;
+@Config.Sources({
+        "classpath:${host}.properties"
+})
 
 public interface WebDriverConfig extends Config {
 
     @Key("baseUrl")
-    @DefaultValue("https://github.com")
-    String getBaseUrl();
+    @DefaultValue("https://demoqa.com")
+    String baseUrl();
 
     @Key("browser")
-    @DefaultValue("CHROME")
-    Browser getBrowser();
+    @DefaultValue("chrome")
+    String browser();
+
+    @Key("browserSize")
+    @DefaultValue("1920x1080")
+    String browserSize();
+
+    @Key("browserVersion")
+    String browserVersion();
 
     @Key("remoteUrl")
-    @DefaultValue("http://localhost:4444")
-    URL getRemoteURL();
+    String remoteUrl();
 }

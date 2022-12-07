@@ -1,31 +1,57 @@
 plugins {
     id 'java'
+    id 'io.qameta.allure' version '2.10.0'
 }
 
-group 'qa.guru'
+group 'org.example'
 version '1.0-SNAPSHOT'
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+allure {
+    report {
+        version.set("2.19.0")
+    }
+    adapter { // отвечает за появление папочки build/allure-results
+        aspectjWeaver.set(true) //обработка аннотации @Step
+        frameworks {
+            junit5 { //название фреймворка
+                adapterVersion.set("2.19.0") //версия интеграции фреймворка и Allure
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation ('org.junit.jupiter:junit-jupiter:5.8.1',
-                        'org.seleniumhq.selenium:selenium-java:3.141.59',
-                        'org.slf4j:log4j-over-slf4j:2.0.2',
-                        'org.slf4j:slf4j-simple:2.0.2',
-                        'org.aeonbits.owner:owner:1.0.4',
-                        'org.assertj:assertj-core:3.23.1',
-                        'io.github.bonigarcia:webdrivermanager:5.3.0')
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter-api:5.9.0',
+            'com.codeborne:selenide:6.7.2',
+            "org.assertj:assertj-core:3.23.1",
+            "org.aspectj:aspectjweaver:1.9.9.1",
+            "org.aeonbits.owner:owner:1.0.12",
+            "org.slf4j:slf4j-simple:2.0.3",
+            'io.github.bonigarcia:webdrivermanager:5.3.0',
+            'io.qameta.allure:allure-selenide:2.19.0'
+    )
 
-    testRuntimeOnly ('org.junit.jupiter:junit-jupiter-engine:5.8.1')
-}
-compileTestJava {
-    options.encoding = 'UTF-8'
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.9.0')
 }
 
-test {
+tasks.withType(Test) {
+    systemProperties(System.getProperties())
     useJUnitPlatform()
-    //-DbaseUrl=https://github.com -Dbrowser=FIREFOX
-    systemProperties(System.getProperties())//Перекладывает system prop в тесты
+
+
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
 }
