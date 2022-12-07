@@ -2,7 +2,7 @@ package qa.guru.owner.config;
 
 import org.aeonbits.owner.Config;
 @Config.Sources({
-        "classpath:${host}.properties"
+        "classpath:${own}.properties"
 })
 
 public interface WebDriverConfig extends Config {
