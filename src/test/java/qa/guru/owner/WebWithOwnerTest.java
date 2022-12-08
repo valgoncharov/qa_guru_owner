@@ -16,6 +16,7 @@ import static io.qameta.allure.Allure.attachment;
 import static io.qameta.allure.Allure.step;
 
 public class WebWithOwnerTest extends TestBase {
+
     @DisplayName("Test with owner")
     @Test
     void practiceFormTest(){
